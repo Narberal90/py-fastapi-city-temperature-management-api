@@ -64,9 +64,6 @@ async def update_city(
 async def delete_city(city_id: int, db: AsyncSession = Depends(get_db)) -> str:
     city = await get_city_by_id(db=db, city_id=city_id)
 
-    if not city:
-        raise HTTPException(status_code=404, detail="City not found")
-
     return await city_delete(db=db, city=city)
 
 

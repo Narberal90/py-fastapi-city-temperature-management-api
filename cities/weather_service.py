@@ -1,10 +1,13 @@
 import os
 
 import httpx
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
 
+
+logger = logging.getLogger(__name__)
 
 async def fetch_weather(city_name: str):
     api_key = os.getenv("WEATHER_API_KEY")
@@ -17,8 +20,11 @@ async def fetch_weather(city_name: str):
         try:
             response = await client.get(url)
             response.raise_for_status()
-            data = response.json()
+            data = await response.json()
             return data["current"]["temp_c"]
         except httpx.HTTPStatusError as e:
-            print(f"Error fetching weather for {city_name}: {e}")
-            return None
+            logger.error(f"HTTP error fetching weather for {city_name}: {e}")
+        except Exception as e:
+            logger.exception(f"Unexpected error fetching weather for {city_name}: {e}")
+
+        return None
